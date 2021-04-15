@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block contents %}
+
+<span style="font-style: inherit; font-size: 2em;"><br/>
+    Catalogs
+</span>
+
+<hr/>
+
+<span style="font-style: inherit; font-size: 1.5em;"><br/>
+    Catalog List
+</span>
+
+<br/>
+<br/>
+
+<button id="btn_catalog_create" onclick="modalOn(this)">Create</button>
+<button id="btn_catalog_delete" onclick="checkedDeleteCatalog()" disabled>Delete</button>
+<form id="checked_delete_catalogs_form">
+    {% csrf_token %}
+    <input type="hidden" id="checked_delete_catalogs_id" name="catalog_data"/>
+</form>
+<p/>
+
+<table border="1">
+    <thead>
+        <th></th>
+        <th>State</th>
+        <th>Scope</th>
+        <th>Name</th>
+        <th>Catalog URL</th>
+        <th>Branch</th>
+        <th>actions</th>
+    </thead>
+
+    <tbody>
+        {% for row in model %}
+            <tr>
+                <td><input type="checkbox" class="catalog_checkbox" onchange="onAnyCatalogCheckboxChanged(this)" value='{{row.name}}'/></td>
+                <td>{{ row.state }}</td>
+                <td>{{ row.scope }}</td>
+                <td>{{ row.name }}</td>
+                <td>{{ row.url }}</td>
+                <td>{{ row.branch }}</td>
+                <td>
+                    {% if row.state == "Disabled" %}
+                        <button type="button" onclick="enabledCatalog(this)" value='{"name":"{{row.name}}"}'>Enabled</button>
+                        <form id="catalog_list_enabled_form">
+                            {% csrf_token %}
+                            <input type="hidden" id="catalog_enabled_id" name="catalog_data"/>
+                        </form>
+                    {% else %}
+                        {% if row.links.update != None %}
+                            <button type="button" onclick="modalOn(this)" value='{"name":"{{row.name}}", "type":"edit", "csrfmiddlewaretoken":"{{ csrf_token }}" }'>Edit</button>
+                        {% endif %}
+                        {% if row.canClone %}
+                            <button type="button" onclick="modalOn(this)" value='{"name":"{{row.name}}", "type":"clone", "csrfmiddlewaretoken":"{{ csrf_token }}" }'>Clone</button>
+                        {% endif %}
+                        {% if row.actions.refresh != None %}
+                            <button type="button" onclick="refreshCatalog(this)" value='{"name":"{{row.name}}"}'>Refresh</button>
+                            <form id="catalog_refresh_form" style="float:right">
+                                {% csrf_token %}
+                                <input type="hidden" id="catalog_refresh_id" name="catalog_data"/>
+                            </form>
+                        {% endif %}
+                        {% if row.links.remove != None %}
+                            <button type="button" onclick="deleteCatalog(this)" value='{"name":"{{row.name}}"}'>Delete</button>
+                            <form id="catalog_list_delete_form" style="float:right">
+                                {% csrf_token %}
+                                <input type="hidden" id="catalog_delete_id" name="catalog_data"/>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<hr/>
+
+<!-- 간이 Modal -->
+<form id="modal_form">
+        {% csrf_token %}
+    <div id="modal_div" style="display: none">
+        <span style="font-style: inherit; font-size: 1.5em;">
+            <label id="modal_title"></label>
+        </span>
+        <br/>
+        <br/>
+
+        <table border="1">
+            <thead>
+                <th>Name</th>
+                <th>Catalog URL</th>
+                <th>Use Private</th>
+                <th>Branch</th>
+                <th>Scope</th>
+                <th>Helm Version</th>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td><input id="modal_name" type="text" required/></td>
+                    <td><input id="modal_url" type="text" required/></td>
+                    <td>
+                        <input type="checkbox" id="modal_private_check_box" onclick="usePrivate()"/>Use Private
+                        <div id="modal_private_div" style="display: none">
+                            id : <input id="modal_private_input_id" type="text" name="input_id"/><br/>
+                            pw : <input id="modal_private_input_pw" type="password" name="input_password"/>
+                        </div>
+                    </td>
+                    <td><input id="modal_branch" type="text" value="master"/></td>
+                    <td>
+                        <select id="modal_global" required>
+                            <option value="Global">global</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select id="modal_helm_version" required>
+                            <option value="rancher-helm">Helm v2</option>
+                            <option value="helm_v3">Helm v3</option>
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <br/>
+
+        <input type="hidden" id="modal_hidden_current_state" name="catalog_data" value=""/>
+
+        <button type="button" onclick="modalSubmit()">Save</button>
+        <button type="button" onclick="modalOff()">Cancel</button>
+    </div>
+</form>
+
+{% endblock %}

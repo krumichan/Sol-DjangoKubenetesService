@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% load storagevolumes_tags %}
+
+
+{% with local=model.volumeType %}
+    <label style="font-weight: bold">{{local.label}}</label><br/>
+    {% for item in local.itemList.items %}
+        <label for="{{item.label}}">
+            <input type="radio" id="{{item.label}}" name="{{local.attribute.id}}" value="{{item.value}}"/>
+            {{item.label}}
+        </label><br/>
+    {% endfor %}
+{% endwith %}
+<br/>
+
+{% with local=model.availabilityZone %}
+    <label style="font-weight: bold">{{local.label}}</label><br/>
+    {% for item in local.itesmList.items %}
+        <label for="{{item.label}}">
+            <input type="radio" id="{{item.label}}" name="{{local.attribute.id}}" value="{{item.value}}"/>
+            {{item.label}}
+        </label><br/>
+    {% endfor %}
+{% endwith %}
+<br/>
+
+{% with local=model.encryption %}
+    <label style="font-weight: bold">{{local.label}}</label><br/>
+    {% for item in local.itesmList.items %}
+        <label for="{{item.label}}">
+            <input type="radio" id="{{item.label}}" name="{{local.attribute.id}}" value="{{item.value}}"/>
+            {{item.label}}
+        </label><br/>
+    {% endfor %}
+{% endwith %}
+<br/>
+
+<label style="font-weight: bold">{{model.fsType.label}}</label><br/>
+<input type="text" id="{{model.fsType.attribute.id}}"

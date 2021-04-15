@@ -1,0 +1,51 @@
+<script>
+
+    function onClick() {
+        const testForm = document.getElementById("run-cis-scan-test-form");
+
+        document.getElementById("run-cis-scan-test-input").value = sample;
+
+        testForm.method = "POST";
+        testForm.action = "/g/clusters/api/run-cis-scan";
+
+        testForm.submit();
+    }
+
+    function onClick1() {
+        const testForm = document.getElementById("run-cis-scan-test-form");
+
+        document.getElementById("run-cis-scan-test-input").value = sample;
+
+        testForm.method = "POST";
+        testForm.action = "/g/clusters/api/run-cis-scan";
+
+        testForm.submit();
+    }
+
+    const sample = `
+        {
+            "overrideBenchmarkVersion": "rke-cis-1.5"
+            , "profile": "permission"
+            , "name": "test3-cluster"
+        }
+    `;
+
+    const sample1 = `
+        {
+            "overrideBenchmarkVersion": "rke-cis-1.5"
+            , "profile": "hardened"
+            , "name": "test3-cluster"
+        }
+    `;
+</script>
+
+<form id="run-cis-scan-test-form">
+    {% csrf_token %}
+    <input type="hidden" id="run-cis-scan-test-input" name="clusterData"/>
+</form>
+
+<label>RKE-CIS-1.5 Permissive</label><br/>
+<button onclick="onClick()">Run CIS Scan Cluster Test</button><br/><br/>
+
+<label>RKE-CIS-1.5 Hardened</label><br/>
+<button onclick="onClick()">Run CIS Scan Cluster Test</button><br/><br/>

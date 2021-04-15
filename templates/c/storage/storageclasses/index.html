@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block contents %}
+
+<span style="font-style: inherit; font-size: 2em;"><br/>
+    Storage Classes
+</span>
+<hr/>
+
+<br/>
+<br/>
+<span style="font-style: inherit; font-size: 2em;"><br/>
+    Actions
+</span>
+<hr/>
+<button>Import YAML</button>
+<button onclick="onGoToAddStorageClass('{{ clusterId }}')">Add Class</button>
+<form id="add_storage_class_form" style="float:right">
+    {% csrf_token %}
+    <input type="hidden" id="add_storage_class_id" name="storage_class_data"/>
+</form>
+
+<br/>
+<br/>
+<span style="font-style: inherit; font-size: 2em;"><br/>
+    Storage Classes List
+</span>
+<hr/>
+
+<table border="1">
+    <thead>
+        <th></th>
+        <th>State</th>
+        <th>Name</th>
+        <th>Provisioner</th>
+        <th>Actions</th>
+    </thead>
+
+    <tbody>
+        {% for row in model %}
+            <tr>
+                <td><input type="checkbox"/></td>
+                <td>{{row.state}}</td>
+                <td>
+                    <label style="cursor: pointer; text-decoration: underline; color: dodgerblue;"
+                           onclick="onGoToStorageClassDetail(this, '{{ clusterId }}')">{{row.name}}</label>
+                    <form id="storage-class-detail-form" style="float: right;">
+                        {% csrf_token %}
+                        <input type="hidden" id="storage-class-detail-id" name="storageClassData"/>
+                    </form>
+                </td>
+                <td>{{row.provisioner}}</td>
+                <td>
+                    {% if row.links.update is not None %}
+                        <button>Edit</button>
+                    {% endif %}
+                    {% if row.links.remove is not None %}
+                        <button>Delete</button>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

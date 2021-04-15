@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block contents %}
+
+{% load persistentvolumes_tags %}
+
+<span style="font-style: inherit; font-size: 2em;"><br/>
+    Persistent Volumes
+</span>
+<hr/>
+
+<br/>
+<br/>
+<span style="font-style: inherit; font-size: 2em;"><br/>
+    Actions
+</span>
+<hr/>
+<button>Import YAML</button>
+<button onclick="onGoToAddPersistentVolume('{{ clusterId }}')">Add Volume</button>
+<form id="add_persistent_volume_form" style="float:right">
+    {% csrf_token %}
+    <input type="hidden" id="add_persistent_volume_id" name="persistent_volume_data"/>
+</form>
+
+<br/>
+<br/>
+<span style="font-style: inherit; font-size: 2em;"><br/>
+    Persistent Volumes List
+</span>
+<hr/>
+
+<button id="group-delete-button" disabled onclick="onGroupDelete()">Delete</button>
+<br/>
+<br/>
+
+<table border="1">
+    <thead>
+        <th></th>
+        <th>State</th>
+        <th>Name</th>
+        <th>Persistent Volumn Claim</th>
+        <th>Source</th>
+        <th>Actions</th>
+    </thead>
+
+    <tbody>
+        {% for row in model %}
+            <tr>
+                <td><input type="checkbox" name="checker" value="{{row.name}}" onchange="onAnyPersistentVolumeCheckBoxChecked()"/></td>
+                <td>{{row.status.phase}}</td>
+                <td>
+                    <label style="cursor: pointer; text-decoration: underline; color: dodgerblue;"
+                           onclick="onGoToPersistentVolumeDetail(this, '{{clusterId}}')">{{row.name}}</label>
+                    <form id="persistent-volume-detail-form" style="float:right">
+                        {% csrf_token %}
+                        <input type="hidden" id="persistent-volume-detail-id" name="persistentVolumeData"/>
+                    </form>
+                </td>
+                <td>
+                    {% if row.claimRef is not None %}
+                        {{row.claimRef.namespace}}/{{row.claimRef.name}}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td>{{row.source}}</td>
+                <td>
+                    {% if row.links.update is not None %}
+                        <button>Edit</button>
+                    {% endif %}
+                    {% if row.canRemove %}
+                        <button name="deletable" value="{{row.name}}" onclick="onDelete(this)">Delete</button>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

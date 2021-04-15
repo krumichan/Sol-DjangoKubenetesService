@@ -1,0 +1,168 @@
+<script>
+
+    function onClick() {
+        const testForm = document.getElementById("rotate-certificates-test-form");
+
+        document.getElementById("rotate-certificates-test-input").value = sample;
+
+        testForm.method = "POST";
+        testForm.action = "/g/clusters/api/rotate-certificates";
+
+        testForm.submit();
+    }
+
+    function onClick1() {
+        const testForm = document.getElementById("rotate-certificates-test-form");
+
+        document.getElementById("rotate-certificates-test-input").value = sample1;
+
+        testForm.method = "POST";
+        testForm.action = "/g/clusters/api/rotate-certificates";
+
+        testForm.submit();
+    }
+
+    function onClick2() {
+        const testForm = document.getElementById("rotate-certificates-test-form");
+
+        document.getElementById("rotate-certificates-test-input").value = sample2;
+
+        testForm.method = "POST";
+        testForm.action = "/g/clusters/api/rotate-certificates";
+
+        testForm.submit();
+    }
+
+    function onClick3() {
+        const testForm = document.getElementById("rotate-certificates-test-form");
+
+        document.getElementById("rotate-certificates-test-input").value = sample3;
+
+        testForm.method = "POST";
+        testForm.action = "/g/clusters/api/rotate-certificates";
+
+        testForm.submit();
+    }
+
+    function onClick4() {
+        const testForm = document.getElementById("rotate-certificates-test-form");
+
+        document.getElementById("rotate-certificates-test-input").value = sample4;
+
+        testForm.method = "POST";
+        testForm.action = "/g/clusters/api/rotate-certificates";
+
+        testForm.submit();
+    }
+
+    function onClick5() {
+        const testForm = document.getElementById("rotate-certificates-test-form");
+
+        document.getElementById("rotate-certificates-test-input").value = sample5;
+
+        testForm.method = "POST";
+        testForm.action = "/g/clusters/api/rotate-certificates";
+
+        testForm.submit();
+    }
+
+    function onClick6() {
+        const testForm = document.getElementById("rotate-certificates-test-form");
+
+        document.getElementById("rotate-certificates-test-input").value = sample6;
+
+        testForm.method = "POST";
+        testForm.action = "/g/clusters/api/rotate-certificates";
+
+        testForm.submit();
+    }
+
+    // all
+    const sample = `
+        {
+            "caCertificates": false
+            , "services": null
+            , "name": "test3-cluster"
+        }
+    `;
+
+    // etcd
+    const sample1 = `
+        {
+            "caCertificates": false
+            , "services": "etcd"
+            , "name": "test3-cluster"
+        }
+    `;
+
+    // kublet
+    const sample2 = `
+        {
+            "caCertificates": false
+            , "services": "kublet"
+            , "name": "test3-cluster"
+        }
+    `;
+
+    // kube-apiserver
+    const sample3 = `
+        {
+            "caCertificates": false
+            , "services": "kube-apiserver"
+            , "name": "test3-cluster"
+        }
+    `;
+
+    // kube-proxy
+    const sample4 = `
+        {
+            "caCertificates": false
+            , "services": "kube-proxy"
+            , "name": "test3-cluster"
+        }
+    `;
+
+    // kube-scheduler
+    const sample5 = `
+        {
+            "caCertificates": false
+            , "services": "kube-scheduler"
+            , "name": "test3-cluster"
+        }
+    `;
+
+    // kube-controller-manager
+    const sample6 = `
+        {
+            "caCertificates": false
+            , "services": "kube-controller-manager"
+            , "name": "test3-cluster"
+        }
+    `;
+</script>
+
+<form id="rotate-certificates-test-form">
+    {% csrf_token %}
+    <input type="hidden" id="rotate-certificates-test-input" name="clusterData"/>
+</form>
+
+<label>all</label><br/>
+<button onclick="onClick()">Rotate Certificates Cluster Test</button><br/><br/>
+
+<label>etcd</label><br/>
+<button onclick="onClick1()">Rotate Certificates Cluster Test</button><br/><br/>
+
+<label>kublet</label><br/>
+<button onclick="onClick2()">Rotate Certificates Cluster Test</button><br/><br/>
+
+<label>kube-apiserver</label><br/>
+<button onclick="onClick3()">Rotate Certificates Cluster Test</button><br/><br/>
+
+<label>kube-proxy</label><br/>
+<button onclick="onClick4()">Rotate Certificates Cluster Test</button><br/><br/>
+
+<label>kube-scheduler</label><br/>
+<button onclick="onClick5()">Rotate Certificates Cluster Test</button><br/><br/>
+
+<label>kube-controller-manager</label><br/>
+<button onclick="onClick6()">Rotate Certificates Cluster Test</button><br/><br/>

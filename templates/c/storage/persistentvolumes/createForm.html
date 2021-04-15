@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block contents %}
+
+<form id="add-persistent-volume-form">
+    {% csrf_token %}
+
+    <input type="hidden" id="persistent-volume-data" name="persistentVolumeData"/>
+</form>
+
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!-- Page Title -->
+
+<!-- Title -->
+<span style="font-style: inherit; font-size: 2em;"><br/>
+    {{model.title}}
+</span>
+<hr/>
+<br/>
+<br/>
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!-- Meta Data -->
+
+<!-- Name -->
+<label style="font-weight: bold">Name</label><br/>
+<input type="text" id="name" placeholder="e.g. myvolume" required/>
+<br/>
+<!-- Description -->
+<label style="font-weight: bold">Description</label><br/>
+<input type="text" id="description" placeholder="e.g. Volume for production database"/>
+<br/>
+<!-- Volume Plugin -->
+<label style="font-weight: bold">Volume Plugin</label><br/>
+<select id="volume-plugin-select" onchange="onVolumePluginSelected(this)" required>
+    <option value="default" selected>Choose a volume plugin..</option>
+    {% for value in model.volumeSources.values %}
+        <option value="{{value.field}}">{{value.title}}</option>
+    {% endfor %}
+</select>
+<br/>
+<!-- Capacity -->
+<label style="font-weight: bold">Capacity</label><br/>
+<input type="number" id="capacity" value="10" required/>GiB
+<br/>
+<br/>
+<br/>
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!-- Plugin Configuration -->
+
+<!-- Title -->
+<span style="font-style: inherit; font-size: 1.5em;"><br/>
+    Plugin Configuration
+</span>
+<!-- Detail -->
+<span style="font-style: inherit; font-size: 1em;"><br/>
+    Configure options for the selected volume plugin
+</span>
+<hr/>
+<!-- Plugin Configuration -->
+<div>
+    <div id="plugin-configuration-parent-div">Choose a Volume Source above...</div>
+    <input id="plugin-configuration-template-hidden"
+           type="hidden"
+           value="{{model.volumeSourcesString}}"/>
+</div>
+<br/>
+<br/>
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!-- Customize -->
+
+<!-- Title -->
+<span style="font-style: inherit; font-size: 1.5em;"><br/>
+    Customize
+</span>
+<!-- Detail -->
+<span style="font-style: inherit; font-size: 1em;"><br/>
+    Customize Advance options
+</span>
+<hr/>
+<!-- Access Mode -->
+<label style="font-weight: bold">{{model.accessModes.label}}</label><br/>
+{% for mode in model.accessModes.mode %}
+    <label for="{{mode.id}}">
+        <input type="checkbox" id="{{mode.id}}" name="accessModes" value="{{mode.value}}"/>
+        {{mode.label}}
+    </label>
+    <br/>
+{% endfor %}
+<br/>
+<br/>
+<!-- Assign to Storage Class -->
+<label style="font-weight: bold">Assign to Storage Class</label><br/>
+<select id="storageClassId">
+    <option value="default">None</option>
+    {% for storage_class in model.storageClasses %}
+        <option value="{{storage_class.id}}">{{storage_class.id}}</option>
+    {% endfor %}
+</select>
+<br/>
+<br/>
+<!-- Mount Options -->
+<label style="font-weight: bold">Mount Options</label>
+<div>
+    <table id="mount-option-table">
+        <tbody>
+
+        </tbody>
+    </table>
+</div>
+<button type="button" onclick="onAddMountOption()">Add Option</button>
+<br/>
+<br/>
+<!-- Node Affinity -->
+<label style="font-weight: bold">Node Affinity</label>
+<table id="node-affinity-table">
+    <tbody>
+
+    </tbody>
+</table>
+<input type="hidden" id="node-affinity-hidden" value="{{model.selectorOperator}}"/>
+<button type="button" onclick="onAddNodeAffinity()">Add Node Selector</button>
+<br/>
+<br/>
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!-- Send Button -->
+<button type="button" onclick="save()">Save</button>
+<button type="button" onclick="cancel()">Cancel</button>
+<!--------------------------------------------------------------------------------------------------------------------------------->
+
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block contents %}
+
+{% load storagevolumes_tags %}
+{% with local=model.cruStorageClass %}
+
+<form id="common-form">
+    {% csrf_token %}
+    <input type="hidden" id="common-id" name="storageClassesData"/>
+</form>
+
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!-- Page Title -->
+
+<!-- Title -->
+<span style="font-style: inherit; font-size: 2em;"><br/>
+    {{local.title.new}}
+</span>
+<hr/>
+<br/>
+<br/>
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!-- Meta Data -->
+
+<!-- Name -->
+<label style="font-weight: bold">{{local.name.label}}</label><br/>
+<input type="text" id="name" placeholder="{{model.cruStorageClass.name.placeholder}}"/>
+<br/>
+<br/>
+<!-- Description -->
+<label style="font-weight: bold">{{local.description.label}}</label><br/>
+<input type="text" id="description" placeholder="{{local.description.placeholder}}"/>
+<br/>
+<br/>
+<!-- Provisioner -->
+<label style="font-weight: bold">{{local.provisioner.label}}</label><br/>
+<input type="text"
+       id="provisioner-input"
+       list="provisioner-datalist"
+       placeholder="select one."
+       value='{{model.storageClass|first:"title"}}'
+       onfocus="onFocusedProvisioner(this)"
+       onchange="onChangedProvisioner(this)"
+       onblur="onBlurProvisioner(this)">
+    <datalist id="provisioner-datalist">
+        {% for key, value in model.storageClass.items %}
+            <option value="{{value.title}}" data-value="{{key}}">
+        {% endfor %}
+        <option value="(Custom)"></option>
+    </datalist>
+<br/>
+<br/>
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!-- Parameters -->
+
+<!-- Title -->
+<span style="font-style: inherit; font-size: 1.5em;"><br/>
+    {{local.parameters.label}}
+</span>
+<!-- Detail -->
+<span style="font-style: inherit; font-size: 1em;"><br/>
+    {{local.parameters.detail}}
+</span>
+<hr/>
+<!-- Parameters -->
+<div>
+    <div id="parameters-parent-div">
+
+    </div>
+    <input type="hidden"
+           id="parameters-template-hidden"
+           value="{{model.storageClassString}}"/>
+</div>
+<br/>
+<br/>
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!-- Customize -->
+
+<!-- Title -->
+<span style="font-style: inherit; font-size: 1.5em;"><br/>
+    {{local.customize.label}}
+</span>
+<!-- Detail -->
+<span style="font-style: inherit; font-size: 1em;"><br/>
+    {{local.customize.detail}}
+</span>
+<hr/>
+<!-- Reclaim Policy -->
+<label style="font-weight: bold">{{local.reclaimPolicy.label}}</label><br/>
+<input type="hidden" id="reclame-policy-name-hidden" value="{{local.reclaimPolicy.field}}"/>
+{% for item in local.reclaimPolicy.items %}
+    {% if item.value == "Recycle" %}
+        <label for="{{item.value}}">
+            <input type="radio" id="{{item.value}}" name="{{local.reclaimPolicy.field}}" disabled/>
+            {{item.label}}
+        </label><br/>
+    {% else %}
+        <label for="{{item.value}}">
+            <input type="radio" id="{{item.value}}" name="{{local.reclaimPolicy.field}}"/>
+            {{item.label}}
+        </label><br/>
+    {% endif %}
+{% endfor %}
+<br/>
+<!-- Volume Binding Mode -->
+<label style="font-weight: bold">{{local.volumeBindingMode.label}}</label><br/>
+<input type="hidden" id="volume-binding-mode-name-hidden" value="{{local.volumeBindingMode.field}}"/>
+{% for item in local.volumeBindingMode|get:"items" %}
+    <label for="{{item.value}}">
+        <input type="radio" id="{{item.value}}" name="{{local.volumeBindingMode.field}}"/>
+        {{item.label}}
+    </label><br/>
+{% endfor %}
+<br/>
+<!-- Mount Options -->
+<label style="font-weight: bold">{{local.mountOptions.label}}</label><br/>
+<table id="mount-options-table">
+    <tbody>
+
+    </tbody>
+</table>
+<button onclick="onAddMountOption(this)"
+        value='{
+            "placeholder": "{{local.mountOptions.placeholder}}"
+            , "field": "{{local.mountOptions.field}}"
+        }'>
+    {{local.mountOptions.addActionLabel}}
+</button>
+<!--------------------------------------------------------------------------------------------------------------------------------->
+
+{% endwith %}
+
+{% endblock %}

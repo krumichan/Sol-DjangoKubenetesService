@@ -1,0 +1,27 @@
+<script>
+
+    function onClick() {
+        const testForm = document.getElementById("save-as-rke-templates-test-form");
+
+        document.getElementById("save-as-rke-templates-test-input").value = sample;
+
+        testForm.method = "POST";
+        testForm.action = "/g/clusters/api/save-as-rke-templates";
+
+        testForm.submit();
+    }
+
+    const sample = `
+        {
+            "clusterTemplateName": "test3-cluster-rke-template"
+            , "name": "test3-cluster"
+        }
+    `;
+</script>
+
+<form id="save-as-rke-templates-test-form">
+    {% csrf_token %}
+    <input type="hidden" id="save-as-rke-templates-test-input" name="clusterData"/>
+</form>
+
+<button onclick="onClick()">Save as RKE Templates Cluster Test</button><br/><br/>

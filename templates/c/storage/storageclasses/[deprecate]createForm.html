@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+
+{% load storagevolumes_tags %}
+
+<!-- Mount Option에 관련된 Java Script -->
+<script>
+    let parentTable;
+    let autoCounter = 0;
+
+    let placeholder;
+    let field;
+
+    // page load 후, 초기화 함수를 호출할 수 있도록 callback을 등록.
+    window.addEventListener("load", initialization);
+
+    /**
+     * Page Load 후 호출되는 초기화 callback 함수.
+     */
+    function initialization() {
+        parentTable = document.getElementById("mount-options-table");
+    }
+
+    function onAddMountOption(button) {
+
+        // placeholder 또는 field 값이 없을 경우, 이를 가지고 온다.
+        if (!!!placeholder || !!!field) {
+            const jsonVal = JSON.parse(button.value);
+            placeholder = jsonVal["placeholder"];
+            field = jsonVal["field"];
+        }
+
+        // tbody를 습득.
+        const tbody = parentTable.getElementsByTagName("tbody")[0];
+
+        // Mount Option을 생성.
+        generateMountOption(tbody, field, placeholder);
+    }
+
+    /**
+     * Add Mount button을 눌렀을 때 호출되는 trigger 함수.
+     * @param tbody row를 추가할 table의 tbody.
+     * @param field row 추가시, row가 가질 name attribute의 값.
+     * @param placeholder input 추가시 넣을 placeholder.
+     */
+    function generateMountOption(tbody, field, placeholder) {
+        // body의 row 생성.
+        const row = tbody.insertRow();
+
+        // remove button의 고유id를 생성하기 위한 suffix.
+        // ( 이것이 없으면, 모든 remove button은 동일 id를 가지게 되어서,
+        //   어떤 remove button을 눌러도 모든 row가 삭제되어버린다. )
+        const counter = autoCounter++;
+
+        // mount option의 하나의 값을 설정하는 row를 추가한다.
+        row.innerHTML =
+            '<tr>' +
+            '   <td><input type="text" name="' + field + '" placeholder="' + placeholder + '"/></td>' +
+            '   <td><button type="button" id="mount-options-remove' + counter.toString() + '">remove</button></td>' +
+            '<tr/>';
+
+        // remove button에 event를 추가한다.
+        $(document).on(
+            "click"
+            , "#mount-options-remove" + counter
+            , function() {
+                row.remove();
+            }
+        );
+    }
+</script>
+
+<script>
+    // provisioner 값이 변하기 전의 값.
+    let before;
+
+    // 정해지는 provisioner이 아닌 custom일 경우의 default 값.
+    let customDefaultValue;
+
+    // provisioner의 label-value 구조.
+    const provisionerMapping = Object();
+
+    // provisioner을 출력할 div.
+    let parentDiv;
+
+    // page load 후, 초기화 함수를 호출할 수 있도록 callback을 등록.
+    window.addEventListener("load", initialization);
+
+    /**
+     * Page Load 후 호출되는 초기화 callback 함수.
+     */
+    function initialization() {
+        // provisioner input tag 습득.
+        const provisionerInput = document.getElementById("provisioner-input");
+
+        // provisioner input tag로부터 값 습득.
+        before = provisionerInput.value;
+
+        // provisioner input으로부터 datalist 추출 및 options 값을 mapping.
+        for (const option of provisionerInput.list.options) {
+            const dataValue = option.getAttribute("data-value");
+
+            // data-value가 존재할 경우, 존재하는 provisioner이라고 판단.
+            if (!isNullOrEmpty(dataValue)) {
+                provisionerMapping[option.getAttribute("value")] = dataValue;
+
+            // data-value가 없는 경우, custom인 provisioner이라고 판단.
+            } else {
+                customDefaultValue = option.getAttribute("value");
+            }
+        }
+
+        parentDiv = document.getElementById("parameters-parent-div");
+    }
+
+    /**
+     * Provisioner Input Field가 Focusing 되었을 때 호출되는 trigger 함수.
+     * @param  self Input Field.
+     */
+    function onFocusedProvisioner(self) {
+        self.value = "";
+    }
+
+    /**
+     * Provisioner Input Field의 값이 Changing 되었을 때 호출되는 trigger 함수.
+     * @param self Provisioner Input Field.
+     */
+    function onChangedProvisioner(self) {
+        before = self.value;
+        self.blur();
+
+        if (before in provisionerMapping) {
+            // 선택된 값에 대한 parameters load.
+            loadExample(parentDiv, provisionerMapping[before]);
+        } else {
+            // input의 value 뒤에 custom suffix를 붙임.
+            let fixValue = self.value + customDefaultValue;
+
+            // custom suffix의 앞까지 모두 잘라버림.
+            fixValue = fixValue.substring(0, fixValue.indexOf(customDefaultValue));
+
+            // 자른 값에 custom suffix를 붙여서 다시 input의 value에 삽입.
+            // 이를 통해서 custom suffix의 중복 삽입을 방지할 수 있다.
+            self.value = fixValue + customDefaultValue;
+
+            // 중복을 제거한 값을 다시 삽입.
+            before = self.value;
+
+            // loadCustomParameterDiv(parentDiv);
+        }
+    }
+
+    /**
+     * Provisioner Input Field가 UnFocusing 되었을 때 호출되는 trigger 함수.
+     * @param self Provisioner Input Field.
+     */
+    function onBlurProvisioner(self) {
+        if (self.value !== before) {
+            self.value = before;
+        }
+    }
+</script>
+
+{% with local=model.cruStorageClass %}
+
+<form id="common-form">
+    {% csrf_token %}
+    <input type="hidden" id="common-id" name="storageClassesData"/>
+</form>
+
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!-- Page Title -->
+
+<!-- Title -->
+<span style="font-style: inherit; font-size: 2em;"><br/>
+    {{local.title.new}}
+</span>
+<hr/>
+<br/>
+<br/>
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!-- Meta Data -->
+
+<!-- Name -->
+<label style="font-weight: bold">{{local.name.label}}</label><br/>
+<input type="text" id="name" placeholder="{{model.cruStorageClass.name.placeholder}}"/>
+<br/>
+<br/>
+<!-- Description -->
+<label style="font-weight: bold">{{local.description.label}}</label><br/>
+<input type="text" id="description" placeholder="{{local.description.placeholder}}"/>
+<br/>
+<br/>
+<!-- Provisioner -->
+<label style="font-weight: bold">{{local.provisioner.label}}</label><br/>
+<input type="text"
+       id="provisioner-input"
+       list="provisioner-datalist"
+       placeholder="select one."
+       value='{{model.storageClass|first:"title"}}'
+       onfocus="onFocusedProvisioner(this)"
+       onchange="onChangedProvisioner(this)"
+       onblur="onBlurProvisioner(this)">
+    <datalist id="provisioner-datalist">
+        {% for key, value in model.storageClass.items %}
+            <option value="{{value.title}}" data-value="{{key}}">
+        {% endfor %}
+        <option value="(Custom)"></option>
+    </datalist>
+<br/>
+<br/>
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!-- Parameters -->
+
+<!-- Title -->
+<span style="font-style: inherit; font-size: 1.5em;"><br/>
+    {{local.parameters.label}}
+</span>
+<!-- Detail -->
+<span style="font-style: inherit; font-size: 1em;"><br/>
+    {{local.parameters.detail}}
+</span>
+<hr/>
+<!-- Parameters -->
+<div>
+    <div id="parameters-parent-div">
+
+    </div>
+    <input type="hidden"
+           id="parameters-template-hidden"
+           value="{{model.storageClassString}}"/>
+</div>
+<br/>
+<br/>
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------------------------------------------------------------->
+<!-- Customize -->
+
+<!-- Title -->
+<span style="font-style: inherit; font-size: 1.5em;"><br/>
+    {{local.customize.label}}
+</span>
+<!-- Detail -->
+<span style="font-style: inherit; font-size: 1em;"><br/>
+    {{local.customize.detail}}
+</span>
+<hr/>
+<!-- Reclaim Policy -->
+<label style="font-weight: bold">{{local.reclaimPolicy.label}}</label><br/>
+<input type="hidden" id="reclame-policy-name-hidden" value="{{local.reclaimPolicy.field}}"/>
+{% for item in local.reclaimPolicy.items %}
+    {% if item.value == "Recycle" %}
+        <label for="{{item.value}}">
+            <input type="radio" id="{{item.value}}" name="{{local.reclaimPolicy.field}}" disabled/>
+            {{item.label}}
+        </label><br/>
+    {% else %}
+        <label for="{{item.value}}">
+            <input type="radio" id="{{item.value}}" name="{{local.reclaimPolicy.field}}"/>
+            {{item.label}}
+        </label><br/>
+    {% endif %}
+{% endfor %}
+<br/>
+<!-- Volume Binding Mode -->
+<label style="font-weight: bold">{{local.volumeBindingMode.label}}</label><br/>
+<input type="hidden" id="volume-binding-mode-name-hidden" value="{{local.volumeBindingMode.field}}"/>
+{% for item in local.volumeBindingMode|get:"items" %}
+    <label for="{{item.value}}">
+        <input type="radio" id="{{item.value}}" name="{{local.volumeBindingMode.field}}"/>
+        {{item.label}}
+    </label><br/>
+{% endfor %}
+<br/>
+<!-- Mount Options -->
+<label style="font-weight: bold">{{local.mountOptions.label}}</label><br/>
+<table id="mount-options-table">
+    <tbody>
+
+    </tbody>
+</table>
+<button onclick="onAddMountOption(this)"
+        value='{
+            "placeholder": "{{local.mountOptions.placeholder}}"
+            , "field": "{{local.mountOptions.field}}"
+        }'>
+    {{local.mountOptions.addActionLabel}}
+</button>
+<!--------------------------------------------------------------------------------------------------------------------------------->
+
+{% endwith %}

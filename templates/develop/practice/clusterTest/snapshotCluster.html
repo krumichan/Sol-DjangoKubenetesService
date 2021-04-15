@@ -1,0 +1,26 @@
+<script>
+
+    function onClick() {
+        const testForm = document.getElementById("snapshot-test-form");
+
+        document.getElementById("snapshot-test-input").value = "";
+
+        const targetList = [
+            "test2-cluster"
+            ,"test3-cluster"
+        ]
+
+        testForm.method = "POST";
+        testForm.action = "/g/clusters/" + targetList.join("&") + "/snapshot-now";
+
+        testForm.submit();
+    }
+
+</script>
+
+<form id="snapshot-test-form">
+    {% csrf_token %}
+    <input type="hidden" id="snapshot-test-input" name="clusterData"/>
+</form>
+
+<button onclick="onClick()">Snapshot Cluster Test</button>

@@ -1,0 +1,129 @@
+<script>
+
+    function onClick() {
+        const testForm = document.getElementById("create-test-form");
+
+        const hiddenInp = document.getElementById("create-test-input");
+        hiddenInp.value = sample;
+
+        testForm.method = "POST";
+        testForm.action = "/g/clusters/api/create";
+
+        testForm.submit();
+    }
+
+    const sample = `
+    {
+       "dockerRootDir":"/var/lib/docker",
+       "enableClusterAlerting":false,
+       "enableClusterMonitoring":false,
+       "enableNetworkPolicy":false,
+       "windowsPreferedCluster":false,
+       "type":"cluster",
+       "name":"test3-cluster",
+       "rancherKubernetesEngineConfig":{
+          "addonJobTimeout":30,
+          "ignoreDockerVersion":true,
+          "sshAgentAuth":false,
+          "type":"rancherKubernetesEngineConfig",
+          "kubernetesVersion":"v1.18.16-rancher1-1",
+          "authentication":{
+             "strategy":"x509",
+             "type":"authnConfig"
+          },
+          "dns":{
+             "type":"dnsConfig",
+             "nodelocal":{
+                "type":"nodelocal",
+                "ip_address":"",
+                "node_selector":null,
+                "update_strategy":{
+
+                }
+             }
+          },
+          "network":{
+             "mtu":0,
+             "plugin":"canal",
+             "type":"networkConfig",
+             "options":{
+                "flannel_backend_type":"vxlan"
+             }
+          },
+          "ingress":{
+             "httpPort":0,
+             "httpsPort":0,
+             "provider":"nginx",
+             "type":"ingressConfig"
+          },
+          "monitoring":{
+             "provider":"metrics-server",
+             "replicas":1,
+             "type":"monitoringConfig"
+          },
+          "services":{
+             "type":"rkeConfigServices",
+             "kubeApi":{
+                "alwaysPullImages":false,
+                "podSecurityPolicy":false,
+                "serviceNodePortRange":"30000-32767",
+                "type":"kubeAPIService"
+             },
+             "etcd":{
+                "creation":"12h",
+                "extraArgs":{
+                   "heartbeat-interval":500,
+                   "election-timeout":5000
+                },
+                "gid":0,
+                "retention":"72h",
+                "snapshot":false,
+                "uid":0,
+                "type":"etcdService",
+                "backupConfig":{
+                   "enabled":true,
+                   "intervalHours":12,
+                   "retention":6,
+                   "safeTimestamp":false,
+                   "type":"backupConfig"
+                }
+             }
+          },
+          "upgradeStrategy":{
+             "maxUnavailableControlplane":"1",
+             "maxUnavailableWorker":"10%",
+             "drain":"false",
+             "nodeDrainInput":{
+                "deleteLocalData":false,
+                "force":false,
+                "gracePeriod":-1,
+                "ignoreDaemonSets":true,
+                "timeout":120,
+                "type":"nodeDrainInput"
+             },
+             "maxUnavailableUnit":"percentage"
+          }
+       },
+       "localClusterAuthEndpoint":{
+          "enabled":true,
+          "type":"localClusterAuthEndpoint"
+       },
+       "labels":{
+
+       },
+       "scheduledClusterScan":{
+          "enabled":false,
+          "scheduleConfig":null,
+          "scanConfig":null
+       }
+    }
+`;
+
+</script>
+
+<form id="create-test-form">
+    {% csrf_token %}
+    <input type="hidden" id="create-test-input" name="clusterData"/>
+</form>
+
+<button onclick="onClick()">Create Cluster Test</button>

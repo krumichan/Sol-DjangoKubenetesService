@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load multiclusterapps_tags %}
+
+{% block contents %}
+
+<span style="font-style: inherit; font-size: 2em;"><br/>
+    Catalog
+</span>
+
+<hr/>
+
+<button onclick="onAppsTemplatesRefresh()">Refresh</button>
+<form id="apps_templates_refresh_form" style="float:right">
+    {% csrf_token %}
+    <input type="hidden" id="apps_templates_refresh_id" name="apps_templates_data"/>
+</form>
+
+<!-- TODO: page에 넘어올 때, category별로 application의 id( 또는 name )을 mapping 하여 넘겨주는 방법도 있음. -->
+<select onchange="onAppsTemplatesCategorySelected(this)">
+    {% for name, count in model.categoryCountDictionary.items %}
+
+        {% if name == model.categoryFocus %}
+            <option value="{{name}}" selected>{{name}} ({{count}})</option>
+        {% else %}
+            <option value="{{name}}">{{name}} ({{count}})</option>
+        {% endif %}
+
+    {% endfor %}
+</select>
+<form id="apps_templates_selected_category_form" style="float:right">
+    {% csrf_token %}
+    <input type="hidden" id="apps_templates_selected_category_id" name="apps_templates_data"/>
+</form>
+
+<br/>
+<br/>
+<hr/>
+
+<span style="font-style: inherit; font-size: 2em;">
+    Multi-Cluster Application List
+</span>
+<br/>
+<br/>
+
+{% for catalog_name, applications in model.data.items %}
+    <span style="font-style: inherit; font-size: 1.5em;">
+    Catalog:{{catalog_name}}
+    </span>
+    <br/>
+    <br/>
+
+    <table border="1">
+        <thead>
+            <th>icon</th>
+            <th>name</th>
+            <th>certified</th>
+            <th></th>
+        </thead>
+
+        <tbody>
+            {% for application in applications %}
+                <tr style="height: 50px">
+                    <td><img width="auto" height="auto" style="max-width: 50px; max-height: 50px" src='{{application.links.icon}}'/></td>
+                    <td>{{application.name}}</td>
+                    <td>
+                        {% if 'io.rancher.certified' in application.labels %}
+                            {% dictKeyLookup application.labels "io.rancher.certified" %}
+                        {% else %}
+                            doesn't exists
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button onclick="onAppsTemplatesLaunch(this)" value='{"id": "{{application.id}}"}'>Launch</button>
+                        <form id="apps_templates_launch_form">
+                            {% csrf_token %}
+                            <input type="hidden" id="apps_templates_launch_id" name="launch_data"/>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endfor %}
+
+{% endblock %}

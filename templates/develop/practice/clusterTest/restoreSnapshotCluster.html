@@ -1,0 +1,73 @@
+<script>
+
+    function onClick1() {
+        const testForm = document.getElementById("restore-snapshot-test-form");
+
+        document.getElementById("restore-snapshot-test-input").value = sample1;
+
+        testForm.method = "POST";
+        testForm.action = "/g/clusters/api/restore-snapshot";
+
+        testForm.submit();
+    }
+
+    function onClick2() {
+        const testForm = document.getElementById("restore-snapshot-test-form");
+
+        document.getElementById("restore-snapshot-test-input").value = sample2;
+
+        testForm.method = "POST";
+        testForm.action = "/g/clusters/api/restore-snapshot";
+
+        testForm.submit();
+    }
+
+    function onClick3() {
+        const testForm = document.getElementById("restore-snapshot-test-form");
+
+        document.getElementById("restore-snapshot-test-input").value = sample3;
+
+        testForm.method = "POST";
+        testForm.action = "/g/clusters/api/restore-snapshot";
+
+        testForm.submit();
+    }
+
+    // etcd
+    const sample1 = `
+        {
+            "etcdBackupId": "c-w5q8c:c-w5q8c-ml-7nczq"
+        }
+    `;
+
+    // etcd and Kubernetes Version
+    const sample2 = `
+        {
+            "etcdBackupId": "c-w5q8c:c-w5q8c-ml-7nczq"
+            , "restoreRkeConfig": "kubernetesVersion"
+        }
+    `;
+
+    // etcd, Kubernetes Version and cluster config
+    const sample3 = `
+        {
+            "etcdBackupId": "c-w5q8c:c-w5q8c-ml-7nczq"
+            , "restoreRkeConfig": "all"
+        }
+    `;
+
+</script>
+
+<form id="restore-snapshot-test-form">
+    {% csrf_token %}
+    <input type="hidden" id="restore-snapshot-test-input" name="clusterData"/>
+</form>
+
+<label>etcd</label><br/>
+<button onclick="onClick1()">Restore Snapshot Cluster Test</button><br/><br/>
+
+<label>etcd and Kubernetes Version</label><br/>
+<button onclick="onClick2()">Restore Snapshot Cluster Test</button><br/><br/>
+
+<label>etcd, Kubernetes Version and cluster config</label><br/>
+<button onclick="onClick3()">Restore Snapshot Cluster Test</button><br/><br/>

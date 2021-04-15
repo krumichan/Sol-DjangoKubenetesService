@@ -1,0 +1,29 @@
+<script>
+
+    function onClick() {
+        const testForm = document.getElementById("node-run-test-form");
+
+        document.getElementById("node-run-test-input").value = sample;
+
+        testForm.method = "POST";
+        testForm.action = "/g/clusters/api/node-run";
+
+        testForm.submit();
+    }
+
+    const sample = `
+        {
+            "nodeCommand": "sudo docker run -d --privileged --restart=unless-stopped --net=host -v /etc/kubernetes:/etc/kubernetes -v /var/run:/var/run rancher/rancher-agent:v2.4.11-rc3 --server https://10.0.0.165 --token nlg7d8vpmzf44rsmg6cvxv8b67n7c4dtlfz275j8dx8g6dxswjhvg8 --ca-checksum 5a3f23186cb6eb6edf0092aeb219c127d9e92b0b24a52badedf33aea7f3a90ba --etcd --controlplane --worker"
+            , "server": "10.0.0.165"
+            , "username": "root"
+            , "password": "classact!"
+        }
+    `;
+</script>
+
+<form id="node-run-test-form">
+    {% csrf_token %}
+    <input type="hidden" id="node-run-test-input" name="clusterData"/>
+</form>
+
+<button onclick="onClick()">Node Run Cluster Test</button>

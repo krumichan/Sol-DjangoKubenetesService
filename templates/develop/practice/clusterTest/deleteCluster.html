@@ -1,0 +1,26 @@
+<script>
+
+    function onClick() {
+        const testForm = document.getElementById("delete-test-form");
+
+        document.getElementById("delete-test-input").value = "";
+
+        const targetList = [
+            "test2-cluster"
+            ,"test3-cluster"
+        ]
+
+        testForm.method = "POST";
+        testForm.action = "/g/clusters/" + targetList.join("&") + "/delete";
+
+        testForm.submit();
+    }
+
+</script>
+
+<form id="delete-test-form">
+    {% csrf_token %}
+    <input type="hidden" id="delete-test-input" name="clusterData"/>
+</form>
+
+<button onclick="onClick()">Delete Cluster Test</button>

@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% block contents %}
+
+{% load persistentvolumes_tags %}
+
+<span style="font-style: inherit; font-size: 2em;"><br/>
+    Persistent Volumes: {{model.name}}
+</span>
+<hr/>
+
+<span style="font-style: inherit; font-size: 1.5em;"><br/>
+    status: {{model.status.phase}}
+</span>
+<br/>
+
+{% if model.links.update is not None %}
+    <button>Edit</button>
+{% endif %}
+{% if model.canRemove %}
+    <button>Remove</button>
+{% endif %}
+<br/>
+<br/>
+
+<span style="font-style: inherit; font-size: 1.5em;"><br/>
+    Information
+</span>
+<hr/>
+
+<table border="1" style="text-align: center;">
+    <tbody>
+        <tr>
+            <td colspan="2">Volume Plugin: {{model.source}}</td>
+            <td colspan="2">Capacity: {{model.capacity.storage}}</td>
+            <td colspan="2">Reclaim Policy: {{model.persistentVolumeReclaimPolicy}}</td>
+        </tr>
+        <tr>
+            <td colspan="3">Persistent Volume Clame:
+                {% if model.claimRef is not None %}
+                    {{model.claimRef.namespace}}/{{model.claimRef.name}}
+                {% else %}
+                    N/A
+                {% endif %}
+            </td>
+            <td colspan="3">Created: {{model.created}}</td>
+        </tr>
+    </tbody>
+</table>
+<br/>
+<br/>
+
+<span style="font-style: inherit; font-size: 1.5em;"><br/>
+    Plugin Configuration
+</span>
+<span style="font-style: inherit; font-size: 1em;"><br/>
+    Configure options for the selected volume plugin
+</span>
+<hr/>
+{% for field, value in model.configuration.items %}
+
+    {% with plugin=model|get:model.field %}
+
+        {% if field in plugin %}
+            <label style="font-weight: bold">{{value.label}}</label><br/>
+
+            {% if value.type == "map/addable" %}
+                <table style="text-align: center;">
+                    <thead>
+                        <th>Key</th>
+                        <th>Value</th>
+                    </thead>
+
+                    <tbody>
+                        {% with attrs=plugin|get:field %}
+
+                            {% for k, v in attrs.items %}
+                                <tr>
+                                    <td>{{k}}</td>
+                                    <td>{{v}}</td>
+                                </tr>
+                            {% endfor %}
+
+                        {% endwith %}
+                    </tbody>
+                </table><br/><br/>
+            {% else %}
+                <label>{{plugin|get:field}}</label><br/><br/>
+            {% endif %}
+
+        {% endif %}
+
+    {% endwith %}
+
+{% endfor %}
+<br/>
+
+<span style="font-style: inherit; font-size: 1.5em;"><br/>
+    Customize
+</span>
+<span style="font-style: inherit; font-size: 1em;"><br/>
+    Customize Advanced options
+</span>
+<hr/>
+
+<label style="font-weight: bold">{{model.accessModes.label}}</label><br/>
+{% for mode in model.accessModes.mode %}
+    <label>{{mode.label}}</label><br/>
+{% endfor %} <br/>
+
+<label style="font-weight: bold">Mount Options</label><br/>
+{% if model.mountOptions %}
+    {% for mountOption in model.mountOptions %}
+        <label>{{mountOption}}</label><br/>
+    {% endfor %}
+{% else %}
+    No Mount Options<br/>
+{% endif %}
+<br/>
+
+<label style="font-weight: bold">Assign to Storage Class</label><br/>
+{% if model.storageClassId is not None %}
+    <label id="storage-class-label" style="cursor: pointer; text-decoration: underline; color: dodgerblue">
+        {{model.storageClassId}}
+    </label>
+{% else %}
+    None
+{% endif %} <br/>
+<br/>
+
+<label style="font-weight: bold">Node Affinity</label><br/>
+{% if model.nodeAffinity is not None %}
+    {% for node in model.nodeAffinity %}
+        <label style="font-weight: bold">rules</label><br/>
+        <table border="1">
+            <thead>
+                <th>Key</th>
+                <th>Operator</th>
+                <th>Values</th>
+            </thead>
+
+            <tbody>
+                {% for expression in node.matchExpressions %}
+                    <tr>
+                        <td>{{expression.key}}</td>
+                        <td>{{expression.operator}}</td>
+                        <td>
+                            {% if "values" in expression %}
+                                {% lookup expression "values" %}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br/>
+    {% endfor %}
+{% else %}
+    No node Selectors<br/>
+{% endif %}
+<br/>
+
+<span style="font-style: inherit; font-size: 1.5em;"><br/>
+    Events
+</span>
+<span style="font-style: inherit; font-size: 1em;"><br/>
+    Events of current persistent volume
+</span>
+<hr/>
+<table border="1">
+    <thead>
+        <th>Type</th>
+        <th>Reason</th>
+        <th>Message</th>
+        <th>Last Seen</th>
+    </thead>
+
+    <tbody>
+        <tr>
+            <td colspan="4" style="text-align: center">No Events</td>
+        </tr>
+    </tbody>
+</table>
+<br/>
+<br/>
+
+<span style="font-style: inherit; font-size: 1.5em;"><br/>
+    Annotations
+</span>
+<span style="font-style: inherit; font-size: 1em;"><br/>
+    Key/value metadata
+</span>
+<hr/>
+<table border="1">
+    <thead>
+        <th>Key</th>
+        <th>Value</th>
+    </thead>
+
+    <tbody>
+        {% if model.annotations %}
+            {% for key, value in model.annotations.items %}
+                <td>{{key}}</td>
+                <td>{{value}}</td>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="2" style="text-align: center">No Annotations</td>
+            </tr>
+        {% endif %}
+
+    </tbody>
+</table>
+
+{% endblock %}

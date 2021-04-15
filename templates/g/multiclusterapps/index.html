@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block contents %}
+
+<span style="font-style: inherit; font-size: 2em;"><br/>
+    Multi-Cluster Apps
+</span>
+
+<hr/>
+
+<button onclick="onGoToManagerCatalogs()">Manage Catalogs</button>
+<form id="manage_catalogs_form" style="float:right">
+    {% csrf_token %}
+    <input type="hidden" id="manage_catalogs_id" name="multi_cluster_applications_data"/>
+</form>
+
+<button onclick="onGoToLaunch()">Launch</button>
+<form id="launch_form" style="float:right">
+    {% csrf_token %}
+    <input type="hidden" id="launch_id" name="multi_cluster_applications_data"/>
+</form>
+
+<br/>
+<br/>
+<hr/>
+
+<span style="font-style: inherit; font-size: 2em;">
+    Multi-Cluster Application List
+</span>
+<br/>
+<br/>
+
+<table border="1">
+    <thead>
+        <th>icon</th>
+        <th>name</th>
+        <th>up to date</th>
+        <th>state</th>
+        <th>target projects</th>
+        <th>actions</th>
+    </thead>
+
+    <tbody>
+        {% for row in model %}
+        <tr>
+            <td>
+                <dev>
+                    {% if row.iconLink is not None %}
+                        <img width="100px" height="100px" align="center" src="{{row.iconLink}}">
+                    {% else %}
+                        doesn't exists
+                    {% endif %}
+                </dev>
+            </td>
+
+            <td>{{ row.name }}</td>
+
+            <td>
+                {% if row.templateVersion is not None %}
+                    <button>
+                        {% if row.templateVersion == row.latestVersion %}
+                            Up to date ({{ row.templateVersion }})
+                        {% else %}
+                            Upgrade available ({{ row.latestVersion }})
+                        {% endif %}
+                    </button>
+                {% else %}
+                    Catalog Template not found
+                {% endif %}
+            </td>
+
+            <td>{{ row.state }}</td>
+
+            <td>
+                <div style="text-align: center;">&lt;Target Projects&gt;</div>
+                {% for target in row.targets %}
+                    [{{target.state}}]  {{target.clusterName}} : {{target.projectName}}<br/>
+                {% endfor %}
+            </td>
+
+            <td>
+                {% if row.templateVersion is not None %}
+                    {% if row.links.self != None %}
+                       <button>Clone</button>
+                    {% endif %}
+                    {% if row.links.update != None %}
+                        <button>Upgrade</button>
+                    {% endif %}
+                    {% if row.links.revisions != None %}
+                        <button>Rollback</button>
+                    {% endif %}
+                {% endif %}
+                {% if row.links.remove != None %}
+                    <button onclick="deleteApplication(this)" value='{"id":"{{row.id}}"}'>Delete</button>
+                    <form id="application_delete_form" style="float:right">
+                        {% csrf_token %}
+                        <input type="hidden" id="application_delete_id" name="multi_cluster_applications_data"/>
+                    </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
